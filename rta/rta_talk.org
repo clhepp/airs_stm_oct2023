@@ -1,11 +1,11 @@
 #+startup: beamer
 #+Options: toc:nil H:1
 #+LaTeX_CLASS_OPTIONS: [10pt,t]
-#+TITLE: \large TITLE
+#+TITLE: \large Evolution and Status of the Stand-Alone Radiative Transfer Algorithm (SARTA)
 #+BEAMER_HEADER: \subtitle{\footnotesize{AIRS Science Team Meeting}}
-#+BEAMER_HEADER: \date{\vspace{0.1in}\footnotesize{October 3, 2018 \vfill}}
-#+BEAMER_HEADER: \author{L. Larrabee Strow\inst{1,2}, Sergio DeSouza--Machado\inst{1,2}, Steven Leroy\inst{3}, Howard Motteler\inst{2}, Chris Hepplewhite\inst{2}, and Steven Buczkowski\inst{2}}
-#+BEAMER_HEADER: \institute[UMBC]{\inst{1} UMBC Physics Dept. \and \inst{2}UMBC JCET \and \inst{3} AER}
+#+BEAMER_HEADER: \date{\vspace{0.1in}\footnotesize{October 4-6, 2023 \vfill}}
+#+BEAMER_HEADER: \author{L. Larrabee Strow\inst{1,2}, Sergio DeSouza--Machado\inst{1,2}, Howard Motteler\inst{2} and Chris Hepplewhite\inst{2}}
+#+BEAMER_HEADER: \institute[UMBC]{\inst{1} UMBC Physics Dept. \and \inst{2}UMBC GESTAR-2/JCET }
 #+BEAMER_HEADER: \input beamer_setup
 #+BEAMER_HEADER: \usetheme{metropolis}
 #+BEAMER_HEADER: \metroset{titleformat title=allcaps}
@@ -14,27 +14,22 @@
 #+BEAMER_HEADER: \tolerance=1000
 #+BEAMER_HEADER: \RequirePackage{fancyvrb}
 #+BEAMER_HEADER: \DefineVerbatimEnvironment{verbatim}{Verbatim}{fontsize=\footnotesize}
-#+BEGIN_EXPORT latex
-\addtobeamertemplate{block begin}{
-  \setlength{\parsep}{0pt}
-  \setlength{\topsep}{3pt plus 2pt minus 2.5pt}
-  \setlength{\itemsep}{0pt plus 0pt minus 2pt}
-  \setlength{\partopsep}{2pt}
-}
-#+END_EXPORT
+!#+BEGIN_EXPORT latex
+!# #\addtobeamertemplate{block begin}{
+!# #  \setlength{\parsep}{0pt}
+!# #  \setlength{\topsep}{3pt plus 2pt minus 2.5pt}
+!# #  \setlength{\itemsep}{0pt plus 0pt minus 2pt}
+!# #  \setlength{\partopsep}{2pt}
+!# #}
+!#+END_EXPORT
 
 * SAMPLE: Motivation
-- Produce Level 1b CHIRP radiances for retrievals
-- Produce Level 3 climate-level gridded CHIRP radiance products
+- Produce Level 1b AIRS,CrIS, IASI and CHIRP radiances for trending and retrievals.
 - Goals
-   - Minimize sensitivity to a-priori estimates, etc.
-   - Remove artificial sampling biases
-   - Perform as much analysis in radiance space for error traceability
-- Geophysical Products
-   - Level 3 T/Q anomalies and trends (and surface T?)
+   - Radiometric stability, inter-sensor bias, intra-sampling bias and trending analysis.
 \vspace{0.05in}
 
-This approach is in principle very simple and quick.  Allows frequency re-processing. 
+Working in radiance space is in principle very simple and quick.  Allows frequent re-processing. 
 
 \vspace{0.05in}
 
@@ -42,79 +37,76 @@ What's Hard:
   - Dealing with clouds
   - AIRS radiometric stability estimates (ie. how good?)
 
-* SAMPLE 2x Figs
-\vspace{-0.3in}
+* Outline of talk
+  - Historical Context
+  - Design Features
+  - Strengths
+  - Limitations
+  - Applications examples
+  - Current Needs, Future Developments
 
-** \footnotesize Some Small Title
-  :PROPERTIES:
-  :BEAMER_env: block
-  :BEAMER_col: 0.55
-  :END:
-\vspace{-0.1in}
-#+ATTR_LATEX: :width \linewidth 
-[[./Figs/Pdf/drying_in_convective_regions_v2.pdf]]
+* Historical Context
 
-\footnotesize
-AIRS, CrIS, IASI are /all/ very stable\\
-CLARREO has removed us from this figure!
-
-** \footnotesize Another Small Title
-  :PROPERTIES:
-  :BEAMER_env: block
-  :BEAMER_col: 0.55
-  :END:
-\vspace{-0.1in}
-#+ATTR_LATEX: :width \linewidth 
-[[./Figs/Pdf/drying_in_convective_regions_v2.pdf]]
-
-\footnotesize
-These are 2-\sigma B(T) statistical uncertainties due to inter-annual variability.  
-
-Some channels, some latitudes not gaussian (strat sudden warmings, QBO, etc.)
+  - The SARTA was developed on 1990s computer systems - light load and memory requirements.
+  - Origninaly developed as part of AIRS level 2 retrieval suite.
+  - First supplied to AIRS project with separate coefficient sets for different instrument focal
+    plane and filter temperatures.
+  - Since 2016 SARTA was delivered for the AIRS.L1C channel SRF specification.
+  - Used for AIRS validation and more recently for CrIS and IASI validation.
+  - In the past couple of years has been adapted for use with CHIRP.
 
 
+* Attributes: Strengths
+  - Implicitly high speed computation (even more on modern systems).
+  - SARTA is available for clear-sky and all-sky (scattering) computations.
+  - Flexible channel selection, multi-sensor compatible, relatively quick development/update turn-around.
+  - The scattering version uses a fast 2-slab model for clouds and aerosols (S. De Souza-Machado).
+  - Model includes H2O, CO2, O3, N2O, CO, CH4, HNO3, HDO, SO2, NH3, nonLTE (4.3 um), Surface emissivity
+    and albedo, scattering from water, ice, aerosols, smoke.  Other absorbers could be added.
+  - Accuracy well quantified.
 
-* SAMPLE 4x Figs
-\vspace{-0.35in}
+* Attributes: Dependencies
+  - Fast coefficients are derived using Optical Depths calculated using kCARTA - the pseudo-line by line
+    RTA (S. De Souza-Machado)
+  - The atmospheric layering is currently defined as the 101 AIRS levels set, using Klayers algorithm.
+  - The atmospheric layering can be changed (see later).
+  - The data format for file I/O uses the HDF4 specification (original to AIRS project) (see later).
+  - The spectral line shapes use the HITRAN databases, cross-sections and various dust and aerosol models.
+  - Code is written in FORTRAN (this is NOT a limitation!).
+  - Radiometric accuracy may be improved with tuning in some regions.
 
-** \footnotesize Some Small Title
-  :PROPERTIES:
-  :BEAMER_env: block
-  :BEAMER_col: 0.45
-  :END:
-\vspace{-0.1in}
-#+ATTR_LATEX: :width \linewidth 
-[[./Figs/Pdf/drying_in_convective_regions_v2.pdf]]
+* Attributes: Limitations
+  - Finite diff Jacs - until now !
+  - HDF4 dependency. 
 
-** \footnotesize Another Small Title
-  :PROPERTIES:
-  :BEAMER_env: block
-  :BEAMER_col: 0.45
-  :END:
-\vspace{-0.1in}
-#+ATTR_LATEX: :width \linewidth 
-[[./Figs/Pdf/drying_in_convective_regions_v2.pdf]]
+* Most Recent updates
+- HITRAN 2020 spectroscopy (actual data available early 2022).
+- HDO included.
+- New nonLTE model being tested.
 
-** 
-:PROPERTIES:
-:BEAMER_env: ignoreheading
-:END:
-\vspace{-0.25in}
 
-** \footnotesize Some Small Title
-  :PROPERTIES:
-  :BEAMER_env: block
-  :BEAMER_col: 0.45
-  :END:
-\vspace{-0.1in}
-#+ATTR_LATEX: :width \linewidth 
-[[./Figs/Pdf/drying_in_convective_regions_v2.pdf]]
+* Updates 1: HITRAN 2020 vs 2016
+- Most significant change in 1050 cm-1 O3 band.
 
-** \footnotesize Another Small Title
-  :PROPERTIES:
-  :BEAMER_env: block
-  :BEAMER_col: 0.45
-  :END:
-\vspace{-0.1in}
-#+ATTR_LATEX: :width \linewidth 
-[[./Figs/Pdf/drying_in_convective_regions_v2.pdf]]
+  #+ATTR_LATEX: :width \linewidth 
+[[./Figs/sarta_cris_hr_h2018_vs_h2020_r49_686_mn_stdaslp.pdf]]
+
+* Updates 2: HDO included
+
+* Updates 3: nonLTE
+
+* Beneficial Future Changes
+- Make independent (agnostic) of file format types (HDF4, H5, netCDF).
+- Simplify packaging and coefficient management.
+- Extend/update training set, add machine learning if demonstrably beneficial.
+- Adapt to the cloud and complete open-source migration (documentation).
+- Re-package code with Julia or Python wrappers for wider community use.
+- Include as part of CHIRP processing suite (cloud).
+
+* Future 1: File format, Coefficient packaging
+
+* Future 2: Adapt to Cloud
+
+
+
+
