@@ -40,27 +40,6 @@
   \setlength{\partopsep}{2pt}
 }
 
-% --------------------------------------------------------------------
-
-\begin{frame}
-  \frametitle{Motivation}
-  \begin{itemize}
-    \item Produce Level 1b AIRS,CrIS, IASI and CHIRP radiances for trending and retrievals.
-    \item Goals
-    \item Radiometric stability, inter-sensor bias, intra-sampling bias and trending analysis.
-    \vspace{0.05in}
-
-    \item Working in radiance space is in principle very simple and quick.  Allows frequent re-processing. 
-
-    \vspace{0.05in}
-
-    \item What's Hard: 
-    \item Dealing with clouds
-    \item AIRS radiometric stability estimates (ie. how good?)
-
-  \end{itemize}
-\end{frame}
-
 % ---------------------------------------------------------------------
 \begin{frame}
   \frametitle{Outline of talk}
@@ -71,6 +50,30 @@
     \item Limitations
     \item Applications examples
     \item Current Needs, Future Developments
+  \end{itemize}
+\end{frame}
+
+% --------------------------------------------------------------------
+\begin{frame}
+  \frametitle{Motivation}
+  \begin{itemize}
+    \item Produce Level 1b AIRS,CrIS, IASI and CHIRP radiances for trending and retrievals.
+    \item Goals
+      \begin{itemize}
+    \item Radiometric stability, inter-sensor bias, intra-sampling bias and trending analysis.
+    \vspace{0.05in}
+
+  \item Working in radiance space is in principle very simple and quick.  Allows frequent re-processing.
+    \end{itemize}
+
+    \vspace{0.05in}
+
+  \item What's Hard:
+    \begin{itemize}
+    \item Dealing with clouds
+    \item AIRS radiometric stability estimates (ie. how good?)
+    \end{itemize}
+    
   \end{itemize}
 \end{frame}
 
@@ -133,9 +136,10 @@
 \begin{frame}
   \frametitle{Most Recent Updates}
   \begin{itemize}
-    \item HITRAN 2020 spectroscopy (actual data available early 2022).
-    \item HDO included.
+    \item HITRAN 2020 spectroscopy (data available early 2022).
+    \item HDO included in MW and SW bands.
     \item New nonLTE model being tested.
+    \item Long term trend bias accuracy for green-house gases; CO2, CH4, N2O has been verified.
   \end{itemize}
 \end{frame}
 
@@ -169,7 +173,7 @@
 \begin{minipage}[c]{0.45\linewidth}
   \includegraphics[width=\linewidth]{./Figs/airs_l1c_hdo_r49_sw_var_depletion.png}
   \caption{Simulated TOA BT changes due to varying HDO depletion, SW band}
-\end{minipage}%
+\end{minipage}
 \end{figure}
 
 
@@ -209,7 +213,7 @@
 \begin{minipage}[c]{0.45\linewidth}
   \includegraphics[width=\linewidth]{./Figs/2016d288g032_nlte_bias_obs_calc_map.pdf}
   \caption{Auroral Emission event, Bias BT at 2352 cm-1.}
-\end{minipage}%
+\end{minipage}
 \end{figure}
 
 
@@ -234,11 +238,68 @@
 \begin{minipage}[c]{0.45\linewidth}
   \includegraphics[width=\linewidth]{./Figs/jac_tz_kcarta.pdf}
   \caption{T(z) Jacobian from kCARTA.}
-\end{minipage}%
+\end{minipage}
 \end{figure}
 
 \end{frame}
 
+% ---------------------------------------------------------------------
+\begin{frame}
+  \frametitle{Updates 5: GHG stability (1 of 2)}
+  \begin{itemize}
+    \item Atmospheric state now includes the long-term values of CO2, CH4 and N2O,
+    the former two as function of latitude, longitude and altitude, from ESRL.
+    \item Obs:Calc biases for selected channels for the 20+ year AIRS mission have been
+    evaluated. (CO and HNO3 are in development).
+  \end{itemize}
+  
+% Side by side figures 
+\begin{figure}
+  \begin{minipage}[c]{0.3\linewidth}
+    \includegraphics[width=\linewidth]{./Figs/co2_ppmv_trend_zonal.pdf}
+    \caption{CO2 values for selected locations.}
+  \end{minipage}
+\hfill
+  \begin{minipage}[c]{0.3\linewidth}
+    \includegraphics[width=\linewidth]{./Figs/ch4_ppmv_trend_zonal.pdf}
+    \caption{CH4 values for selected locations}
+  \end{minipage}
+\hfill
+  \begin{minipage}[c]{0.3\linewidth}
+    \includegraphics[width=\linewidth]{./Figs/n2o_ppmv_trend_zonal.pdf}
+    \caption{N2O values for selected locations}
+  \end{minipage}
+\end{figure}  
+
+\end{frame}
+
+% ---------------------------------------------------------------------
+\begin{frame}
+  \frametitle{Updates 5: GHG stability (2 of 2)}
+  \begin{itemize}
+  \item Obs:Calc Biases are the averages of the first day of each month global random FOVs
+    matched to NWP and ESRL.
+  \end{itemize}
+
+% Side by side figures 
+\begin{figure}
+  \begin{minipage}[c]{0.3\linewidth}
+    \includegraphics[width=\linewidth]{./Figs/airs_l1c_oc_bias_co2_trend.pdf}
+    \caption{CO2 bias of observed and simulated radiance.}
+  \end{minipage}
+\hfill
+  \begin{minipage}[c]{0.3\linewidth}
+    \includegraphics[width=\linewidth]{./Figs/airs_l1c_oc_bias_ch4_trend.pdf}
+    \caption{CH4 bias of observed and simulated radiance.}
+  \end{minipage}
+\hfill
+  \begin{minipage}[c]{0.3\linewidth}
+    \includegraphics[width=\linewidth]{./Figs/airs_l1c_oc_bias_n2o_trend.pdf}
+    \caption{N2O bias of observed and simulated radiance.}
+  \end{minipage}
+\end{figure}  
+
+\end{frame}
 % ---------------------------------------------------------------------
 \begin{frame}
   \frametitle{Beneficial Future Changes}
@@ -255,13 +316,14 @@
 
 % ---------------------------------------------------------------------
 \begin{frame}
-  \frametitle{Future 1: File format, Coefficient packaging}
+  \frametitle{Future 1: File format, Language and packaging}
   \begin{itemize}
     \item Currently there are 15 separate coefficient tables with many different predictors
       some predictors are common amongst some sets.
     \item Coefficients are stored as fortran binary files.
-    \item Atmospheric state variables are supplied to SARTA as HDF-4 format files. 
-  
+    \item Atmospheric state variables are supplied to SARTA as HDF-4 format files.
+    \item Core routines are FORTRAN, with MATLAB wrappers, linked to HDF4 libraries.
+    \item Unification and simplification for easier access to general users.
 
   \end{itemize}
 \end{frame}
@@ -270,7 +332,11 @@
 \begin{frame}
   \frametitle{Future 2: Adapt to the cloud}
   \begin{itemize}
-    \item
+  \item Application to studies based in the {\it cloud}, especially where hyperspectral sensor
+    data are cloud accessible, requires SARTA and dependencies to be portable.
+  \item AWS (Amazon Cloud) does permit use of MATLAB licence but for open-source use,
+    SARTA wrappers need to be repackaged to Julia or Python for example.
+  \item Opensource use in general requires simplification and documentation, test and examples.
 
   \end{itemize}
 \end{frame}
@@ -279,6 +345,8 @@
 \begin{frame}
   \frametitle{Conclusions}
   \begin{itemize}
+  \item Continue validation studies, include tuning where beneficial, possible
+    refinement of modelling in UTLS.
   \item SARTA remains a core component of research at UMBC/GESTAR-2 having been extended
     to simulation of radiances for several hyperspectral infrared sensors.
   \item SARTA radiometric accuracy continues to meet the needs for long term stabilty
